@@ -7,6 +7,7 @@ import { Editors } from './editors';
 import { Code } from './code';
 import { QuickInput } from './quickinput';
 import { basename, isAbsolute } from 'path';
+import { Dialog } from './dialog';
 
 enum QuickAccessKind {
 	Files = 1,
@@ -16,13 +17,19 @@ enum QuickAccessKind {
 
 export class QuickAccess {
 
-	constructor(private code: Code, private editors: Editors, private quickInput: QuickInput) { }
+	constructor(private code: Code, private editors: Editors, private quickInput: QuickInput, private dialog: Dialog) { }
 
 	async openFileQuickAccessAndWait(searchValue: string, expectedFirstElementNameOrExpectedResultCount: string | number): Promise<void> {
 
 		// make sure the file quick access is not "polluted"
 		// with entries from the editor history when opening
-		await this.runCommand('workbench.action.clearEditorHistoryWithoutConfirm');
+		if (this.code.version.minor < 104) {
+			// TODO: remove this when stable becomes 1.104
+			await this.runCommand('workbench.action.clearEditorHistory');
+			await this.dialog.clickPrimaryButton();
+		} else {
+			await this.runCommand('workbench.action.clearEditorHistoryWithoutConfirm');
+		}
 
 		const PollingStrategy = {
 			Stop: true,

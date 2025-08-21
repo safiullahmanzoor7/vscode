@@ -22,6 +22,7 @@ import { Terminal } from './terminal';
 import { Notebook } from './notebook';
 import { Localization } from './localization';
 import { Task } from './task';
+import { Dialog } from './dialog';
 
 export interface Commands {
 	runCommand(command: string, options?: { exactLabelMatch?: boolean }): Promise<any>;
@@ -31,6 +32,7 @@ export class Workbench {
 
 	readonly quickaccess: QuickAccess;
 	readonly quickinput: QuickInput;
+	readonly dialog: Dialog;
 	readonly editors: Editors;
 	readonly explorer: Explorer;
 	readonly activitybar: ActivityBar;
@@ -51,7 +53,8 @@ export class Workbench {
 	constructor(code: Code) {
 		this.editors = new Editors(code);
 		this.quickinput = new QuickInput(code);
-		this.quickaccess = new QuickAccess(code, this.editors, this.quickinput);
+		this.dialog = new Dialog(code);
+		this.quickaccess = new QuickAccess(code, this.editors, this.quickinput, this.dialog);
 		this.explorer = new Explorer(code);
 		this.activitybar = new ActivityBar(code);
 		this.search = new Search(code);
